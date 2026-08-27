@@ -15,7 +15,7 @@ jobs:
 
     - name: Download Cloudflared
       run: |
-        Invoke-WebRequest https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-windows-amd64.exe -OutFile cloudflared.exe
+        Invoke-WebRequest https://github.com/cloudflare/cloudflared/releases/download/2026.8.2/cloudflared-windows-amd64.exe -OutFile cloudflared.exe
 
     - name: Enable RDP Access
       run: |
