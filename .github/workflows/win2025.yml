@@ -1,17 +1,22 @@
-name: Windows 2025 (Cloudflare Tunnel)
+name: Windows RDP via Cloudflare Tunnel
 
 on: workflow_dispatch
 
 jobs:
   build:
-    runs-on: windows-2025
-    timeout-minutes: 9999
+    runs-on: windows-latest  # Use a valid runner
+    timeout-minutes: 360     # Maximum allowed by GitHub
 
     steps:
     - name: Download Required Files
       run: |
         Invoke-WebRequest https://pastebin.com/raw/qqpuNmye -OutFile start.bat
-        Invoke-WebRequest https://pastebin.com/raw/MLPL2x4F -OutFile loop.bat
+        # Create loop.bat locally since the pastebin URL is broken
+        @"
+        :loop
+        timeout /t 60 /nobreak >nul
+        goto loop
+        "@ | Out-File -FilePath loop.bat -Encoding ascii
 
     - name: Download Cloudflared
       run: |
