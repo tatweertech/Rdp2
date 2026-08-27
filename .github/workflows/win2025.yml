@@ -4,15 +4,35 @@ on: workflow_dispatch
 
 jobs:
   build:
-    runs-on: windows-latest  # Use a valid runner
-    timeout-minutes: 360     # Maximum allowed by GitHub
+    runs-on: windows-latest  # Fixed: changed from windows-2025
+    timeout-minutes: 360     # Fixed: maximum allowed by GitHub
 
     steps:
-    - name: Download Required Files
+    - name: Create start.bat
       run: |
-        Invoke-WebRequest https://pastebin.com/raw/qqpuNmye -OutFile start.bat
-        # Create loop.bat locally since the pastebin URL is broken
         @"
+        @echo off
+        echo =============================================
+        echo CLOUDFLARE TUNNEL RDP CONNECTION INFO
+        echo =============================================
+        echo.
+        echo Your RDP credentials are:
+        echo Username: runneradmin
+        echo Password: P@ssw0rd!
+        echo.
+        echo The Cloudflare tunnel address appears in the logs above.
+        echo Look for a line containing: https://*.trycloudflare.com
+        echo.
+        echo This session will stay alive for up to 6 hours.
+        echo Press Ctrl+C to cancel, or close this window.
+        echo =============================================
+        pause
+        "@ | Out-File -FilePath start.bat -Encoding ascii
+
+    - name: Create loop.bat
+      run: |
+        @"
+        @echo off
         :loop
         timeout /t 60 /nobreak >nul
         goto loop
@@ -32,7 +52,7 @@ jobs:
       run: |
         Start-Process Powershell -ArgumentList '-NoExit -Command ".\cloudflared.exe tunnel --url tcp://localhost:3389"'
 
-    - name: Start Session Info
+    - name: Display Connection Info
       run: cmd /c start.bat
 
     - name: Keep Runner Alive
